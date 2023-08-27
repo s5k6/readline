@@ -184,7 +184,7 @@ bind_keyseq:
 	  keyseq[l++] = '\\';
 	  keyseq[l++] = '\\';
 	}
-      else if (key == '\0')	  
+      else if (key == '\0')
 	{
 	  keyseq[l++] = '\\';
 	  keyseq[l++] = '0';
@@ -382,7 +382,7 @@ rl_generic_bind (int type, const char *keyseq, char *data, Keymap map)
   int keys_len, prevkey, ic;
   register int i;
   KEYMAP_ENTRY k;
-  Keymap prevmap;  
+  Keymap prevmap;
 
   k.function = 0;
 
@@ -555,7 +555,7 @@ rl_translate_keyseq (const char *seq, char *array, int *len)
 	      i++;
 	      has_meta = 1;
 	      continue;
-	    }	      
+	    }
 
 	  /* Translate other backslash-escaped characters.  These are the
 	     same escape sequences that bash's `echo' and `printf' builtins
@@ -958,7 +958,7 @@ rl_trim_arg_from_keyseq	(const char *keyseq, size_t len, Keymap map)
      key sequence that consists solely of a numeric argument */
   return -1;
 }
-  
+
 /* The last key bindings file read. */
 static char *last_readline_init_file = (char *)NULL;
 
@@ -1079,7 +1079,7 @@ _rl_read_init_file (const char *filename, int include_level)
   RL_CHECK_SIGNALS ();
   if (buffer == 0)
     return (errno);
-  
+
   if (include_level == 0 && filename != last_readline_init_file)
     {
       FREE (last_readline_init_file);
@@ -1213,7 +1213,7 @@ parse_comparison_op (s, indp)
     }
 
   *indp = i;
-  return op;        
+  return op;
 }
 
 /* **************************************************************** */
@@ -1521,7 +1521,7 @@ parser_include (char *args)
 
   return r;
 }
-  
+
 /* Associate textual names with actual functions. */
 static const struct {
   const char * const name;
@@ -1710,7 +1710,7 @@ rl_parse_and_bind (char *string)
 	      while (e >= value && whitespace (*e))
 		e--;
 	      e++;		/* skip back to whitespace or EOS */
-	  
+
 	      if (*e && e >= value)
 		*e = '\0';
 	    }
@@ -1942,7 +1942,7 @@ static const char *
 boolean_varname (int i)
 {
   return ((i >= 0) ? boolean_varlist[i].name : (char *)NULL);
-}  
+}
 
 /* Hooks for handling special boolean variables, where a
    function needs to be called or another variable needs
@@ -1987,6 +1987,9 @@ static int sv_region_start_color (const char *);
 static int sv_region_end_color (const char *);
 static int sv_bell_style (const char *);
 static int sv_combegin (const char *);
+#if defined (COLOR_SUPPORT)
+static int sv_completion_prefix_color (const char *value);
+#endif
 static int sv_dispprefix (const char *);
 static int sv_compquery (const char *);
 static int sv_compwidth (const char *);
@@ -2010,15 +2013,18 @@ static const struct {
   { "comment-begin",	V_STRING,	sv_combegin },
   { "completion-display-width", V_INT,	sv_compwidth },
   { "completion-prefix-display-length", V_INT,	sv_dispprefix },
+#if defined (COLOR_SUPPORT)
+  { "completion-prefix-color", V_STRING, sv_completion_prefix_color },
+#endif
   { "completion-query-items", V_INT,	sv_compquery },
   { "editing-mode",	V_STRING,	sv_editmode },
-  { "emacs-mode-string", V_STRING,	sv_emacs_modestr },  
+  { "emacs-mode-string", V_STRING,	sv_emacs_modestr },
   { "history-size",	V_INT,		sv_histsize },
   { "isearch-terminators", V_STRING,	sv_isrchterm },
   { "keymap",		V_STRING,	sv_keymap },
   { "keyseq-timeout",	V_INT,		sv_seqtimeout },
-  { "vi-cmd-mode-string", V_STRING,	sv_vicmd_modestr }, 
-  { "vi-ins-mode-string", V_STRING,	sv_viins_modestr }, 
+  { "vi-cmd-mode-string", V_STRING,	sv_vicmd_modestr },
+  { "vi-ins-mode-string", V_STRING,	sv_viins_modestr },
   { (char *)NULL,	0, (_rl_sv_func_t *)0 }
 };
 
@@ -2037,7 +2043,7 @@ static const char *
 string_varname (int i)
 {
   return ((i >= 0) ? string_varlist[i].name : (char *)NULL);
-}  
+}
 
 /* A boolean value that can appear in a `set variable' command is true if
    the value is null or empty, `on' (case-insensitive), or "1".  All other
@@ -2251,6 +2257,30 @@ sv_bell_style (const char *value)
     return 1;
   return 0;
 }
+
+
+
+#if defined (COLOR_SUPPORT)
+
+extern char *_rl_completion_prefix_color;
+
+static int
+sv_completion_prefix_color (const char *value)
+{
+  if (value == 0 || *value == '\0') {
+    FREE(_rl_completion_prefix_color);
+    _rl_completion_prefix_color = NULL;
+    _rl_colored_completion_prefix = 0;  // FIXME remove when deprecated
+  } else {
+    _rl_completion_prefix_color = savestring(value);
+    _rl_colored_completion_prefix = 1;  // FIXME remove when deprecated
+  }
+  return 0;
+}
+
+#endif
+
+
 
 static int
 sv_isrchterm (const char *value)
@@ -2758,7 +2788,7 @@ rl_invoking_keyseqs_in_map (rl_command_func_t *function, Keymap map)
 		    keyname[l++] = (char) c;
 		    keyname[l++] = '\0';
 		  }
-		
+
 		strcat (keyname, seqs[i]);
 		xfree (seqs[i]);
 
@@ -3014,7 +3044,7 @@ _rl_get_string_variable_value (const char *name)
     }
   else if (_rl_stricmp (name, "keyseq-timeout") == 0)
     {
-      sprintf (numbuf, "%d", _rl_keyseq_timeout);    
+      sprintf (numbuf, "%d", _rl_keyseq_timeout);
       return (numbuf);
     }
   else if (_rl_stricmp (name, "emacs-mode-string") == 0)

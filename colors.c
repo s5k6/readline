@@ -128,25 +128,22 @@ _rl_custom_readline_prefix (void)
 bool
 _rl_print_prefix_color (void)
 {
-  struct bin_str *s;
+  if (_rl_completion_prefix_color == NULL)
+    return 0;
 
-  /* What do we want to use for the prefix? Let's try cyan first, see colors.h */
-  s = _rl_custom_readline_prefix ();
-  if (s == 0)
-    s = &_rl_color_indicator[C_PREFIX];
-  if (s->string != NULL)
-    {
-      if (is_colored (C_NORM))
-	restore_default_color ();
-      _rl_put_indicator (&_rl_color_indicator[C_LEFT]);
-      _rl_put_indicator (s);
-      _rl_put_indicator (&_rl_color_indicator[C_RIGHT]);
-      return 0;
-    }
-  else
-    return 1;
+  struct bin_str s;
+  s.len = strnlen(_rl_completion_prefix_color, 16);
+  s.string = _rl_completion_prefix_color;
+
+  if (is_colored (C_NORM))
+    restore_default_color ();
+
+  _rl_put_indicator (&_rl_color_indicator[C_LEFT]);
+  _rl_put_indicator (&s);
+  _rl_put_indicator (&_rl_color_indicator[C_RIGHT]);
+  return 0;
 }
-  
+
 /* Returns whether any color sequence was printed. */
 bool
 _rl_print_color_indicator (const char *f)

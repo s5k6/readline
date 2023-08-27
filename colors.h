@@ -117,6 +117,8 @@ enum filetype
 /* Prefix color, currently same as socket */
 #define C_PREFIX	C_SOCK
 
+extern char *_rl_completion_prefix_color;
+
 extern void _rl_put_indicator (const struct bin_str *ind);
 extern void _rl_set_normal_color (void);
 extern bool _rl_print_prefix_color (void);
