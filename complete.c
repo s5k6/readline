@@ -213,10 +213,6 @@ int _rl_completion_columns = -1;
    completions.  The colors used are taken from $LS_COLORS, if set. */
 int _rl_colored_stats = 0;
 
-/* Non-zero means to use a color (currently magenta) to indicate the common
-   prefix of a set of possible word completions. */
-int _rl_colored_completion_prefix = 0;
-
 /* The color to use for the matching prefix during completion.  NULL
    means "no coloring". */
 char *_rl_completion_prefix_color = NULL;
@@ -891,7 +887,7 @@ fnprint (const char *to_print, int prefix_bytes, const char *real_pathname)
     prefix_bytes = 0;
 
 #if defined (COLOR_SUPPORT)
-  if (_rl_colored_stats && (prefix_bytes == 0 || _rl_colored_completion_prefix <= 0))
+  if (_rl_colored_stats && (prefix_bytes == 0 || !_rl_completion_prefix_color))
     colored_stat_start (real_pathname);
 #endif
 
@@ -907,7 +903,7 @@ fnprint (const char *to_print, int prefix_bytes, const char *real_pathname)
     }
 #if defined (COLOR_SUPPORT)
   else if (prefix_bytes && _rl_completion_prefix_display_length <= 0 &&
-	   _rl_colored_completion_prefix > 0)
+	   _rl_completion_prefix_color)
     {
       common_prefix_len = prefix_bytes;
       prefix_bytes = 0;
@@ -1617,11 +1613,11 @@ rl_display_match_list (char **matches, int len, int max)
 
       if (common_length > _rl_completion_prefix_display_length && common_length > ELLIPSIS_LEN)
 	max -= common_length - ELLIPSIS_LEN;
-      else if (_rl_colored_completion_prefix <= 0)
+      else if (!_rl_completion_prefix_color)
 	common_length = sind = 0;
     }
 #if defined (COLOR_SUPPORT)
-  else if (_rl_colored_completion_prefix > 0)
+  else if (_rl_completion_prefix_color)
     {
       t = printable_part (matches[0]);
       temp = rl_filename_completion_desired ? strrchr (t, '/') : 0;

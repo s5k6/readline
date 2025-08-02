@@ -1875,7 +1875,6 @@ static const struct {
   { "blink-matching-paren",	&rl_blink_matching_paren,	V_SPECIAL },
   { "byte-oriented",		&rl_byte_oriented,		0 },
 #if defined (COLOR_SUPPORT)
-  { "colored-completion-prefix",&_rl_colored_completion_prefix,	0 },
   { "colored-stats",		&_rl_colored_stats,		0 },
 #endif
   { "completion-ignore-case",	&_rl_completion_case_fold,	0 },
@@ -2257,7 +2256,6 @@ sv_completion_prefix_color (const char *value)
   if (value == 0 || *value == '\0') {
     FREE(_rl_completion_prefix_color);
     _rl_completion_prefix_color = NULL;
-    _rl_colored_completion_prefix = 0;
   } else {
     for (int i = 0; i < strlen (value); i++) {
       if (! (value[i] == ';' || isdigit (value[i])) ) {
@@ -2266,7 +2264,6 @@ sv_completion_prefix_color (const char *value)
       }
     }
     _rl_completion_prefix_color = savestring(value);
-    _rl_colored_completion_prefix = 1;
   }
   return 0;
 }
